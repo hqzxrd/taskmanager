@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>TaskManager</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <script src="./js/jscolor.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="./css/cssworld.ru-xcal.css" />
+    <script type="text/javascript" src="./js/cssworld.ru-xcal-en.js"></script>
+  </head>
+  <body>
+    <div class="wrapper">
+      <div class="options options-hide hide">
+        <div class="options__wrapper">
+          <h1>Создать задачу</h1>
+          <div class="options__text">
+            <input class="options__task" type="text" />
+          </div>
+          <div class="options__time hide">
+            <input
+              class="options__date"
+              type="text"
+              value="2022.09.26 20:12:45"
+              onClick="xCal(this, {lang: 'ru', order: 1})"
+              onKeyUp="xCal()"
+            />
+          </div>
+          <div class="options__selectTask">
+            <input id="selectTask" type="checkbox" />
+            Создать точную задачу
+          </div>
+          <div class="color-text">Цвет текста</div>
+          <input
+            class="options__color-text"
+            value="#000000FF"
+            data-jscolor="{preset:'dark large'}"
+          />
+          <div class="color-bg">Цвет фона</div>
+          <input
+            class="options__color-bg"
+            value="#FFFAFAFF"
+            data-jscolor="{preset:'dark large'}"
+          />
+          <div class="options__OK">Создать</div>
+        </div>
+      </div>
+
+      <div class="options-editor options-editor-hide hide">
+        <div class="options-editor__wrapper">
+          <h1>Редактировать задачу</h1>
+          <div class="options-editor__text">
+            <input class="options-editor__task" type="text" placeholder="" />
+          </div>
+          <div class="color-text">Цвет текста</div>
+          <input
+            class="options-editor__color-text"
+            value="#000000FF"
+            data-jscolor="{preset:'dark large'}"
+          />
+          <div class="color-bg">Цвет фона</div>
+          <input
+            class="options-editor__color-bg"
+            value="#FFFAFAFF"
+            data-jscolor="{preset:'dark large'}"
+          />
+          <div class="options-editor__OK">Редактировать</div>
+        </div>
+      </div>
+
+      <div class="add">+</div>
+      <div class="close hide">+</div>
+      <div class="save">Сохранить</div>
+      <div class="load">Загрузить</div>
+      <div class="task-manager"></div>
+    </div>
+    <div class="task-list">
+      <div class="buttons">
+        <h1>Лист задач</h1>
+        <div class="task-list__open"><span>></span></div>
+        <div class="task-list__close"><span><</span></div>
+      </div>
+      <div class="list"></div>
+    </div>
+    <script src="js/bundle.js"></script>
+  </body>
+</html>

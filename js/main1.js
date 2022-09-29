@@ -210,7 +210,7 @@ class Task extends Abstract {
     <div class="abstract" id="${this.id}">
         <div draggable="true" class="abstractTask exact">
         <span class="exactAnim"></span>
-        <div>${this.task}</div>
+        ${this.task}
         </div>
       <div class="addAbstractWrapper">
           <div class="addAbstract">+</div>

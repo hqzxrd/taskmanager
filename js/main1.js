@@ -77,6 +77,24 @@ function hideCreate() {
   options.classList.add(`options-hide`);
 }
 
+colorText.addEventListener(`change`, (e) => {
+  createTask.style.color = colorText.value;
+});
+
+colorBg.addEventListener(`change`, () => {
+  createTask.style.backgroundColor = colorBg.value;
+});
+
+function color() {
+  abstractArr.forEach((item) => {
+    let elem = document.getElementById(item.id);
+    elem = elem.querySelector(`.abstractTask`);
+    console.log(elem);
+    elem.style.color = item.colorText;
+    elem.style.backgroundColor = item.colorBg;
+  });
+}
+
 selectTask.addEventListener(`change`, (e) => {
   if (e.target.checked) {
     optionsTime.classList.remove(`hide`);
@@ -106,12 +124,14 @@ let abstractId = [];
 let arrowLinks = {};
 let allArrows = []; //для очистки стрелок
 class Abstract {
-  constructor(task, id = -1, x = 0, y = 0) {
+  constructor(task, colorBg, colorText, id = -1, x = 0, y = 0) {
     this.type = 0;
     this.task = task;
     this.x = x;
     this.y = y;
     this.countDone = 0;
+    this.colorBg = colorBg;
+    this.colorText = colorText;
 
     if (id == -1) {
       this.id = this.newId();
@@ -194,24 +214,23 @@ class Abstract {
 }
 
 class Task extends Abstract {
-  constructor(task, id, x, y, deadline, done = false) {
-    super(task, id, x, y);
+  constructor(task, colorBg, colorText, id, x, y, deadline, done = false) {
+    super(task, colorBg, colorText, id, x, y);
     this.type = 1;
     this.done = done;
     this.deadline = deadline;
 
     this.exactAnim();
-    this.addTaskInTasklist();
   }
 
   abstract() {
     let elem = `
     
     <div class="abstract" id="${this.id}">
-        <div draggable="true" class="abstractTask exact">
-        <span class="exactAnim"></span>
-        ${this.task}
-        </div>
+<div draggable="true" class="abstractTask exact">
+<span class="exactAnim"></span>
+${this.task}
+</div>
       <div class="addAbstractWrapper">
           <div class="addAbstract">+</div>
            <div class="deleteAbstract">-</div>
@@ -232,27 +251,27 @@ class Task extends Abstract {
     });
   }
 
-  addTaskInTasklist() {
-    let elem = `
-    <div class="list__wrapper">
-      <div class="list__task-wrapper">
-        <div class="list__task ">${this.task}</div>
-        
-        <div class="time">
-        Время
-        <div class="timer timer__days">00</div>
-              <div class="timer timer__hours">00</div>
-              <div class="timer timer__minutes">00</div>
-              <div class="timer timer__seconds">00</div>
-        </div>
-      </div>
+  // addTaskInTasklist() {
+  //   let elem = `
+  //   <div class="list__wrapper">
+  //     <div class="list__task-wrapper">
+  //       <div class="list__task ">${this.task}</div>
 
-      <div class="complete hide">Готово</div>
-      <input class="list__done ${this.id}" type="checkbox" />
-    </div>
-    `;
-    list.innerHTML += elem;
-  }
+  //       <div class="time">
+  //       Время
+  //       <div class="timer timer__days">00</div>
+  //             <div class="timer timer__hours">00</div>
+  //             <div class="timer timer__minutes">00</div>
+  //             <div class="timer timer__seconds">00</div>
+  //       </div>
+  //     </div>
+
+  //     <div class="complete hide">Готово</div>
+  //     <input class="list__done ${this.id}" type="checkbox" />
+  //   </div>
+  //   `;
+  //   list.innerHTML += elem;
+  // }
 }
 taskList.addEventListener(`change`, (e) => {
   if (e.target.classList.contains(`list__done`)) {
@@ -365,6 +384,52 @@ function showTime() {
 
 setInterval(showTime, 1000);
 
+function sort() {
+  abstractArr.sort((a, b) => {
+    if (a.type > b.type) {
+      return 1;
+    } else {
+      return -1;
+    }
+  });
+
+  abstractArr.sort((a, b) => {
+    let d1 = new Date(a.deadline) - new Date();
+    let d2 = new Date(b.deadline) - new Date();
+    if (d1 > d2) {
+      return 1;
+    } else {
+      return -1;
+    }
+  });
+
+  list.innerHTML = `Сортировка..`;
+  list.innerHTML = ``;
+  abstractArr.forEach((item) => {
+    if (item.type == 1) {
+      let elem = `
+      <div class="list__wrapper">
+        <div class="list__task-wrapper">
+          <div class="list__task ">${item.task}</div>
+          
+          <div class="time">
+          Время
+          <div class="timer timer__days">00</div>
+                <div class="timer timer__hours">00</div>
+                <div class="timer timer__minutes">00</div>
+                <div class="timer timer__seconds">00</div>
+          </div>
+        </div>
+  
+        <div class="complete hide">Готово</div>
+        <input class="list__done ${item.id}" type="checkbox" />
+      </div>
+      `;
+      list.innerHTML += elem;
+    }
+  });
+}
+
 ////////////////////////////////////////////////////////////////
 
 let mouseY;
@@ -446,13 +511,28 @@ document.addEventListener(`dblclick`, (e) => {
 
 edit.addEventListener(`click`, (e) => {
   editTask(elemId, editTaskInput.value);
+
+  optionsEditor.classList.add(`options-editor-hide`);
+  optionsEditor.classList.remove(`options-editor-show`);
 });
 
 function editTask(id, task) {
   abstractArr.forEach((item) => {
     if (item.id == id) {
+      item.colorBg = colorBgEdit.value;
+      item.colorText = colorTextEdit.value;
+      elem.style.backgroundColor = item.colorBg;
+      elem.style.color = item.colorText;
+
       item.task = task;
       elem.textContent = task;
+      if (item.type == 1) {
+        elem.innerHTML = `
+<span class="exactAnim"></span>
+${task}
+`;
+        item.exactAnim();
+      }
     }
   });
   console.log(abstractArr);
@@ -551,17 +631,29 @@ create.addEventListener(`click`, (e) => {
   let task = createTask.value;
   let time = optionsDate.value;
   if (task != ``) {
-    addAbstract(task, time);
+    addAbstract(colorBg.value, colorText.value, task, time);
     createTask.value = ``;
   }
 });
 
-function addAbstract(task, deadline, id, x, y, done, type = -1) {
+function addAbstract(
+  colorBg,
+  colorText,
+  task,
+  deadline,
+  id,
+  x,
+  y,
+  done,
+  type = -1
+) {
   const selectTask = document.getElementById(`selectTask`);
   if ((selectTask.checked && type == -1) || type == 1) {
-    abstractArr.push(new Task(task, id, x, y, deadline, done));
+    abstractArr.push(
+      new Task(task, colorBg, colorText, id, x, y, deadline, done)
+    );
   } else {
-    abstractArr.push(new Abstract(task, id, x, y));
+    abstractArr.push(new Abstract(task, colorBg, colorText, id, x, y));
   }
 
   if (arrowLinks[abstractArr[abstractArr.length - 1].id] == undefined) {
@@ -579,6 +671,8 @@ function addAbstract(task, deadline, id, x, y, done, type = -1) {
   check();
   change();
   showTime();
+  color();
+  sort();
   console.log(abstractArr);
 }
 
@@ -615,6 +709,8 @@ function loadlocal() {
   arrowLinks = newArrowLinks;
   localAbstractArr.forEach((item) => {
     addAbstract(
+      item.colorBg,
+      item.colorText,
       item.task,
       item.deadline,
       item.id,

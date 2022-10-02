@@ -280,6 +280,7 @@ taskList.addEventListener(`change`, (e) => {
         if (item.id == e.target.classList[1]) {
           item.done = true;
           change();
+          showTime();
           abstractDone();
         }
       });
@@ -288,6 +289,7 @@ taskList.addEventListener(`change`, (e) => {
         if (item.id == e.target.classList[1]) {
           item.done = false;
           change();
+          showTime();
           abstractDone();
         }
       });
@@ -300,17 +302,21 @@ function check() {
 
   checkboxes.forEach((box) => {
     abstractArr.forEach((item) => {
+      console.log(box, item);
+      console.log(`ABOBA`);
       if (
         item.done == true &&
         box.classList[1] == item.id &&
         item.done != undefined
       ) {
+        console.log(`true`);
         box.checked = true;
       } else if (
         item.done == false &&
         box.classList[1] == item.id &&
         item.done != undefined
       ) {
+        console.log(`ne true`);
         box.checked = false;
       }
     });
@@ -668,11 +674,13 @@ function addAbstract(
       childs: new Set(),
     };
   }
-  check();
-  change();
+  console.log(`pre check`);
+  // setTimeout(check, 5);
   showTime();
   color();
   sort();
+  check();
+  change();
   console.log(abstractArr);
 }
 

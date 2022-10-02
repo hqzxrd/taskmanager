@@ -45,7 +45,7 @@ function closeTaskList() {
   taskListOpen.style.display = `block`;
   list.style.display = `none`;
 }
-// closeTaskList();
+closeTaskList();
 
 taskListOpen.addEventListener(`click`, (e) => {
   openTaskList();
@@ -89,7 +89,6 @@ function color() {
   abstractArr.forEach((item) => {
     let elem = document.getElementById(item.id);
     elem = elem.querySelector(`.abstractTask`);
-    console.log(elem);
     elem.style.color = item.colorText;
     elem.style.backgroundColor = item.colorBg;
   });
@@ -219,6 +218,8 @@ class Task extends Abstract {
     this.type = 1;
     this.done = done;
     this.deadline = deadline;
+    this.time = 0;
+    this.timeStart = 0;
 
     this.exactAnim();
   }
@@ -249,6 +250,18 @@ ${this.task}
       exactAnim.style.width = getComputedStyle(item).width;
       exactAnim.style.height = getComputedStyle(item).height;
     });
+  }
+
+  deadlineAnim() {
+    let elem = document.getElementById(this.id);
+    this.time = 1;
+    elem = elem.children[0].children[0];
+    if (elem.classList.contains(`deadlineAnim`)) {
+    } else {
+      elem.classList.remove(`exactAnim`);
+      elem.classList.add(`deadlineAnim`);
+      console.log(elem);
+    }
   }
 
   // addTaskInTasklist() {
@@ -302,21 +315,17 @@ function check() {
 
   checkboxes.forEach((box) => {
     abstractArr.forEach((item) => {
-      console.log(box, item);
-      console.log(`ABOBA`);
       if (
         item.done == true &&
         box.classList[1] == item.id &&
         item.done != undefined
       ) {
-        console.log(`true`);
         box.checked = true;
       } else if (
         item.done == false &&
         box.classList[1] == item.id &&
         item.done != undefined
       ) {
-        console.log(`ne true`);
         box.checked = false;
       }
     });
@@ -329,10 +338,14 @@ function change() {
     if (item.done != undefined) {
       if (item.done) {
         elem.childNodes[1].childNodes[1].classList.remove(`exactAnim`);
+        elem.childNodes[1].childNodes[1].classList.remove(`deadlineAnim`);
         elem.childNodes[1].classList.add(`done`);
-      } else {
+      } else if (item.time == 0) {
         elem.childNodes[1].classList.remove(`done`);
         elem.childNodes[1].childNodes[1].classList.add(`exactAnim`);
+      } else if (item.time == 1) {
+        elem.childNodes[1].classList.remove(`done`);
+        elem.childNodes[1].childNodes[1].classList.add(`deadlineAnim`);
       }
     }
   });
@@ -367,10 +380,18 @@ function showTime() {
           elem.classList.remove(`hide`);
           complete.classList.add(`hide`);
           let dt = getTime(item.deadline);
+          if (item.timeStart == 0) {
+            item.timeStart = dt.total;
+          }
           let days = elem.childNodes[1];
           let hours = elem.childNodes[3];
           let minutes = elem.childNodes[5];
           let seconds = elem.childNodes[7];
+          let t = new Date();
+          console.log(dt.total, item.timeStart, item.timeStart * 0.3);
+          if (dt.total < item.timeStart * 0.3) {
+            item.deadlineAnim();
+          }
           if (dt.total < 0) {
             days.textContent = dt.days + 1 + `d`;
             hours.textContent = dt.hours + 1 + `h`;
@@ -409,14 +430,13 @@ function sort() {
     }
   });
 
-  list.innerHTML = `Сортировка..`;
   list.innerHTML = ``;
   abstractArr.forEach((item) => {
     if (item.type == 1) {
       let elem = `
       <div class="list__wrapper">
         <div class="list__task-wrapper">
-          <div class="list__task ">${item.task}</div>
+          <div class="list__task ${item.id}">${item.task}</div>
           
           <div class="time">
           Время
@@ -524,6 +544,7 @@ edit.addEventListener(`click`, (e) => {
 
 function editTask(id, task) {
   abstractArr.forEach((item) => {
+    let taskListText = document.querySelectorAll(`.list__task`);
     if (item.id == id) {
       item.colorBg = colorBgEdit.value;
       item.colorText = colorTextEdit.value;
@@ -532,6 +553,13 @@ function editTask(id, task) {
 
       item.task = task;
       elem.textContent = task;
+      console.log(taskListText, taskListText.classList);
+      taskListText.forEach((itemTask) => {
+        if (item.id == itemTask.classList[1]) {
+          itemTask.textContent = task;
+        }
+      });
+
       if (item.type == 1) {
         elem.innerHTML = `
 <span class="exactAnim"></span>
@@ -541,7 +569,6 @@ ${task}
       }
     }
   });
-  console.log(abstractArr);
 }
 
 function updateProgress(id, value) {
@@ -674,14 +701,13 @@ function addAbstract(
       childs: new Set(),
     };
   }
-  console.log(`pre check`);
+
   // setTimeout(check, 5);
   showTime();
   color();
   sort();
   check();
   change();
-  console.log(abstractArr);
 }
 
 save.addEventListener(`click`, () => {
